@@ -1,9 +1,11 @@
 (ns twit-bot.core
   (:require [clojure.data.json :as json]
             [environ.core :refer [env]]
+            [clojure.tools.logging :as log]
+            [clojure.core.async :as async]
             [twitter.api.restful :refer [statuses-mentions-timeline]]
             [twitter.callbacks.handlers :as handlers]
-            [twitter.callbacks.protocols :refer [map->AsyncStreamingCallback]]
+            [twitter.callbacks.protocols :refer [map->SyncStreamingCallback]]
             [twitter.oauth :refer [make-oauth-creds]]))
 
 (def creds-keys [:app-consumer-key
@@ -26,27 +28,41 @@
       (json/read-json)))
 
 (defn process-tweets [tweets]
+  (log/info "Processing" (count tweets) "tweets")
   (doseq [tweet tweets]
     (let [text (:text tweet)
           user (get-in tweet [:user :screen_name])]
-      (println user text))))
+      (log/info "Tweet: " user text))))
 
-(defn print-keys [tweets]
-  (println (map keys tweets)))
+(defn fetch-tweets [creds]
+  (:body (statuses-mentions-timeline :oauth-creds creds)))
 
-; callback that just prints the text of the status
-(def printer-callback
-  (map->AsyncStreamingCallback {:on-bodypart (comp process-tweets parse-bodypart)
-                                :on-failure (comp println handlers/response-return-everything)
-                                :on-exception handlers/exception-print}))
+(defn start-bot [control-ch frequency]
+  (log/info "Starting bot...")
+  (async/go-loop []
+    (let [[data ch] (async/alts! [control-ch (async/timeout frequency)])]
+      (log/info "tick...")
+      (cond
 
-(defn start-bot []
-  (statuses-mentions-timeline
-    :oauth-creds my-creds
-    :callbacks printer-callback))
+        (= control-ch ch)
+        (if (= data :stop)
+          (log/info "Ok, no more tweets")
+          (do
+            (log/info "Don't know what to do with" data ". Try again while I keep tweeting...")
+            (recur)))
+
+        ; tick, let's fetch tweets!
+        :else
+        (do
+          (process-tweets (fetch-tweets my-creds))
+          (recur))))))
 
 (comment
-  (def running-bot (start-bot))
+  (def control-ch (async/chan))
+  (def running-bot (start-bot control-ch 5000))
+
+  (async/put! control-ch :stop)
+  (async/put! control-ch :pause)
 
   ((:cancel (meta running-bot)))
   ((:cancelled? (meta running-bot))))
