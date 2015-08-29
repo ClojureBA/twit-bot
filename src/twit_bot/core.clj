@@ -5,7 +5,7 @@
             [clojure.core.async :as async]
             [twitter.api.restful :refer [statuses-mentions-timeline]]
             [twitter.callbacks.handlers :as handlers]
-            [twitter.callbacks.protocols :refer [map->SyncStreamingCallback]]
+            [twitter.callbacks.protocols :refer [map->SyncSingleCallback]]
             [twitter.oauth :refer [make-oauth-creds]]))
 
 (def creds-keys [:app-consumer-key
@@ -35,7 +35,12 @@
       (log/info "Tweet: " user text))))
 
 (defn fetch-tweets [creds]
-  (:body (statuses-mentions-timeline :oauth-creds creds)))
+  (statuses-mentions-timeline
+    :oauth-creds creds
+    :callbacks (map->SyncSingleCallback
+                 {:on-success handlers/response-return-body
+                  :on-failure (comp #(log/error %) handlers/get-twitter-error-message)
+                  :on-exception handlers/exception-print})))
 
 (defn start-bot [control-ch frequency]
   (log/info "Starting bot...")
@@ -64,8 +69,8 @@
   (async/put! control-ch :stop)
   (async/put! control-ch :pause)
 
-  ((:cancel (meta running-bot)))
-  ((:cancelled? (meta running-bot))))
+  (fetch-tweets my-creds)
+  )
 
 (defn -main [& args]
-  (start-bot))
+  (async/<!! (start-bot (async/chan) 5000)))
