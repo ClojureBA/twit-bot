@@ -7,11 +7,11 @@ A Twitter bot that ...
 - Create twitter app: apps.twitter.com (needs mobile phone in account)
 - Set Read/Write permissions
 - Take note of consumer key & secret
-- Authorize app in bot account, for example using twurl:
+- Authorize app in bot account, for example using twurl (ruby gem):
 
-    gem install twurl
-    twurl authorize --consumer-key "consumer-key" \
-      --consumer-secret "consumer-secret"
+        gem install twurl
+        twurl authorize --consumer-key "consumer-key" \
+          --consumer-secret "consumer-secret"
 
 - Grab tokens from ~/.twurlrc and save them in `.lein-env` (you can use `.lein-env.sample` file as an example)
 
@@ -19,12 +19,12 @@ A Twitter bot that ...
 
 The project provides just a skeleton for the bot: `process-tweets` will be called every time a new batch of tweets is received from the mentions timeline stream
 
-From there, you can do anything! Just some ideas:
+From there, you can do anything! The sky is the limit! Just some ideas:
 
   - Assume the tweet will contain clojure code, so eval it and respond to the user with the output. If you like to walk on the safe side, you should take a look to [clojail](https://github.com/Raynes/clojail)
   - YARPSB (AKA: Yet Another Rock, Paper, Scissors Bot)
   - url shortener?
-  - Even an echobot could be a good idea to play around with clojure!
+  - Even an echobot would be a good idea to play around with clojure!
 
 ## License
 
