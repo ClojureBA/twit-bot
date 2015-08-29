@@ -7,6 +7,7 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [environ "1.0.0"]
                  [twitter-api "0.7.8"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
 
                  ; logging :/
                  [org.clojure/tools.logging "0.3.1"]
