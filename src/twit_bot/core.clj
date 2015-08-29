@@ -22,11 +22,6 @@
   (let [creds (read-creds-from-env)]
     (apply make-oauth-creds (map creds creds-keys))))
 
-(defn parse-bodypart [response baos]
-  (-> baos
-      (.toString "UTF-8")
-      (json/read-json)))
-
 (defn process-tweets [tweets]
   (log/info "Processing" (count tweets) "tweets")
   (doseq [tweet tweets]
