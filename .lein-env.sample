@@ -1,0 +1,4 @@
+{:app-consumer-key "KEY"
+ :app-consumer-secret "SECRET"
+ :user-access-token "TOKEN"
+ :user-access-token-secret "SECRET"}

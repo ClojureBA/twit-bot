@@ -2,7 +2,7 @@
 
 A Twitter bot that ...
 
-## Config
+## Setup
 
 - Create twitter app: apps.twitter.com (needs mobile phone in account)
 - Set Read/Write permissions
@@ -13,7 +13,7 @@ A Twitter bot that ...
     twurl authorize --consumer-key "consumer-key" \
       --consumer-secret "consumer-secret"
 
-- Grab tokens from ~/.twurlrc
+- Grab tokens from ~/.twurlrc and save them in `.lein-env` (you can use `.lein-env.sample` file as an example)
 
 ## License
 
