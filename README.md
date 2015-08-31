@@ -6,6 +6,7 @@ A Twitter bot that ...
 
 - Create twitter app: apps.twitter.com (needs mobile phone in account)
 - Set Read/Write permissions
+- Uncheck "Allow this application to be used to Sign in with Twitter" in the app settings
 - Take note of consumer key & secret
 - Authorize app in bot account, for example using twurl (ruby gem):
 
