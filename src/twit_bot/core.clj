@@ -3,7 +3,7 @@
             [environ.core :refer [env]]
             [clojure.tools.logging :as log]
             [clojure.core.async :as async]
-            [twitter.api.restful :refer [statuses-mentions-timeline]]
+            [twitter.api.restful :refer [statuses-mentions-timeline search-tweets]]
             [twitter.callbacks.handlers :as handlers]
             [twitter.callbacks.protocols :refer [map->SyncSingleCallback]]
             [twitter.oauth :refer [make-oauth-creds]]))
@@ -36,6 +36,15 @@
                  {:on-success handlers/response-return-body
                   :on-failure (comp #(log/error %) handlers/get-twitter-error-message)
                   :on-exception handlers/exception-print})))
+
+(defn find-tweets [creds query]
+  (search-tweets :oauth-creds creds
+                 :params {:q query}
+                 :callbacks (map->SyncSingleCallback
+                             {:on-success handlers/response-return-body
+                              :on-failure (comp #(log/error %)
+                                                handlers/get-twitter-error-message)
+                              :on-exception handlers/exception-print})))
 
 (defn start-bot [control-ch frequency]
   (log/info "Starting bot...")
